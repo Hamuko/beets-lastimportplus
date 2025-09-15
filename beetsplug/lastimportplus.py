@@ -234,8 +234,8 @@ def process_tracks(lib, tracks, log):
             )
             query = dbcore.AndQuery(
                 [
-                    dbcore.query.SubstringQuery("album", album),
-                    dbcore.query.SubstringQuery("title", title),
+                    dbcore.query.StringQuery("album", album),
+                    dbcore.query.StringQuery("title", title),
                 ]
             )
             song = lib.items(query).get()
@@ -245,8 +245,8 @@ def process_tracks(lib, tracks, log):
             log.debug("no album match, trying by artist/title")
             query = dbcore.AndQuery(
                 [
-                    dbcore.query.SubstringQuery("artist", artist),
-                    dbcore.query.SubstringQuery("title", title),
+                    dbcore.query.StringQuery("artist", artist),
+                    dbcore.query.StringQuery("title", title),
                 ]
             )
             song = lib.items(query).get()
@@ -257,8 +257,8 @@ def process_tracks(lib, tracks, log):
             log.debug("no title match, trying utf-8 single quote")
             query = dbcore.AndQuery(
                 [
-                    dbcore.query.SubstringQuery("artist", artist),
-                    dbcore.query.SubstringQuery("title", title),
+                    dbcore.query.StringQuery("artist", artist),
+                    dbcore.query.StringQuery("title", title),
                 ]
             )
             song = lib.items(query).get()
