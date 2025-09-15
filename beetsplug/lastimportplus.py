@@ -114,7 +114,7 @@ class CustomUser(pylast.User):
 
 def import_lastfm(lib, log):
     user = config["lastfm"]["user"].as_str()
-    per_page = config["lastimport"]["per_page"].get(int)
+    per_page = config["lastimportplus"]["per_page"].get(int)
 
     if not user:
         raise ui.UserError("You must specify a user name for lastimport")
@@ -125,7 +125,7 @@ def import_lastfm(lib, log):
     page_current = 0
     found_total = 0
     unknown_total = 0
-    retry_limit = config["lastimport"]["retry_limit"].get(int)
+    retry_limit = config["lastimportplus"]["retry_limit"].get(int)
     # Iterate through a yet to be known page total count
     while page_current < page_total:
         log.info(
