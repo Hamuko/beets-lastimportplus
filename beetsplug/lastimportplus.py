@@ -276,8 +276,9 @@ def process_tracks(lib, tracks, log):
                     count,
                     new_count,
                 )
-                song["play_count"] = new_count
-                song.store()
+                if count != new_count:
+                    song["play_count"] = new_count
+                    song.store()
                 total_found += 1
         else:
             total_fails += 1
