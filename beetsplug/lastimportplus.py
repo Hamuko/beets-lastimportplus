@@ -203,7 +203,7 @@ def process_tracks(lib, tracks, log):
     log.info("Received {} tracks in this page, processing...", total)
 
     for num in range(0, total):
-        song = None
+        results = None
         trackid = tracks[num]["mbid"].strip() if tracks[num]["mbid"] else None
         artist = (
             tracks[num]["artist"].get("name", "").strip()
@@ -226,9 +226,11 @@ def process_tracks(lib, tracks, log):
             song = lib.items(
                 dbcore.query.MatchQuery("mb_trackid", trackid)
             ).get()
+            if song:
+                results = [song]
 
         # If not, try just album/title
-        if song is None:
+        if not results:
             log.debug(
                 "no album match, trying by album/title: {} - {}", album, title
             )
@@ -238,10 +240,10 @@ def process_tracks(lib, tracks, log):
                     dbcore.query.StringQuery("title", title),
                 ]
             )
-            song = lib.items(query).get()
+            results = lib.items(query)
 
         # If not, try just artist/title
-        if song is None:
+        if not results:
             log.debug("no album match, trying by artist/title")
             query = dbcore.AndQuery(
                 [
@@ -249,10 +251,10 @@ def process_tracks(lib, tracks, log):
                     dbcore.query.StringQuery("title", title),
                 ]
             )
-            song = lib.items(query).get()
+            results = lib.items(query)
 
         # Last resort, try just replacing to utf-8 quote
-        if song is None:
+        if not results:
             title = title.replace("'", "\u2019")
             log.debug("no title match, trying utf-8 single quote")
             query = dbcore.AndQuery(
@@ -261,21 +263,22 @@ def process_tracks(lib, tracks, log):
                     dbcore.query.StringQuery("title", title),
                 ]
             )
-            song = lib.items(query).get()
+            results = lib.items(query)
 
-        if song is not None:
-            count = int(song.get("play_count", 0))
+        if results:
             new_count = int(tracks[num].get("playcount", 1))
-            log.debug(
-                "match: {0.artist} - {0.title} ({0.album}) updating:"
-                " play_count {1} => {2}",
-                song,
-                count,
-                new_count,
-            )
-            song["play_count"] = new_count
-            song.store()
-            total_found += 1
+            for song in results:
+                count = int(song.get("play_count", 0))
+                log.debug(
+                    "match: {0.artist} - {0.title} ({0.album}) updating:"
+                    " play_count {1} => {2}",
+                    song,
+                    count,
+                    new_count,
+                )
+                song["play_count"] = new_count
+                song.store()
+                total_found += 1
         else:
             total_fails += 1
             log.info("  - No match: {} - {} ({})", artist, title, album)
