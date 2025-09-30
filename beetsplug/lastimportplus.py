@@ -62,9 +62,7 @@ class CustomUser(pylast.User):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def _get_things(
-        self, method, thing, thing_type, params=None, cacheable=True
-    ):
+    def _get_things(self, method, thing, thing_type, params=None, cacheable=True):
         """Returns a list of the most played thing_types by this thing, in a
         tuple with the total number of pages of results. Includes an MBID, if
         found.
@@ -182,9 +180,7 @@ def fetch_tracks(user, page, limit):
     """
     network = pylast.LastFMNetwork(api_key=config["lastfm"]["api_key"])
     user_obj = CustomUser(user, network)
-    results, total_pages = user_obj.get_top_tracks_by_page(
-        limit=limit, page=page
-    )
+    results, total_pages = user_obj.get_top_tracks_by_page(limit=limit, page=page)
     return [
         {
             "mbid": track.item.mbid if track.item.mbid else "",
@@ -223,17 +219,13 @@ def process_tracks(lib, tracks, log):
 
         # First try to query by musicbrainz's trackid
         if trackid:
-            song = lib.items(
-                dbcore.query.MatchQuery("mb_trackid", trackid)
-            ).get()
+            song = lib.items(dbcore.query.MatchQuery("mb_trackid", trackid)).get()
             if song:
                 results = [song]
 
         # If not, try just album/title
         if not results:
-            log.debug(
-                "no album match, trying by album/title: {} - {}", album, title
-            )
+            log.debug("no album match, trying by album/title: {} - {}", album, title)
             query = dbcore.AndQuery(
                 [
                     dbcore.query.StringQuery("album", album),
