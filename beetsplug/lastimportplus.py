@@ -269,6 +269,11 @@ def process_tracks(lib, tracks, log):
             new_count = int(tracks[num].get("playcount", 1))
             for song in results:
                 count = int(song.get("play_count", 0))
+                if normalize_title(song.title) != normalize_title(title):
+                    # Skip songs where the title isn't a case-insensitive match, so for
+                    # example "Track Title" isn't matched with "Track Title (karaoke)".
+                    log.debug("mismatch: '{0}' does not match '{1}'", song.title, title)
+                    continue
                 log.debug(
                     "match: {0.artist} - {0.title} ({0.album}) updating:"
                     " play_count {1} => {2}",
@@ -293,3 +298,8 @@ def process_tracks(lib, tracks, log):
         )
 
     return total_found, total_fails
+
+
+def normalize_title(title):
+    """Perform some basic cleanup for better song title comparisons."""
+    return title.lower().replace("\u2019", "'")
