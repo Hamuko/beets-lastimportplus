@@ -1,6 +1,6 @@
 [project]
 name = "beets-lastimportplus"
-version = "0.1.0"
+version = "0.2.0"
 description = "Modified version of the beets lastimport plugin"
 readme = "README.md"
 authors = [
